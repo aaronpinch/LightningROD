@@ -52,3 +52,48 @@ lr-dev.db
 lr-dev.db-wal
 lr-dev.db-shm
 lr-dev.db.seeded
+
+# ─── Secrets & local data (public repo: see CLAUDE.md) ─────────────────────
+# Env files: only the placeholder template is tracked
+.env.*
+!.env.example
+*.env
+
+# Keys, certificates, credential files
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa*
+id_ed25519*
+secrets.yaml
+secrets.json
+credentials*.json
+*token*.json
+*.secret
+
+# Databases, dumps, backups
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+*.bak
+backups/
+pgdata/
+
+# Real exports and API captures (keep fixtures in tests/fixtures/)
+exports/
+captures/
+*.har
+logs/
+*.log
+
+# Local agent/tooling state
+.planning/
+.claude/settings.local.json
+CLAUDE.local.md

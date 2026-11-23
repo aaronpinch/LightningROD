@@ -2,6 +2,7 @@
 #
 # LightningROD pre-commit hook.
 #
+# Secret scan runs via gitleaks (config: .gitleaks.toml).
 # Content checks (PII + reference hygiene) run via scripts/checker.py.
 # Lint (ruff) and types (mypy, advisory) run after.
 #
@@ -23,6 +24,21 @@ elif command -v python3 >/dev/null 2>&1; then
     PYTHON="python3"
 else
     echo "pre-commit: python3 not found; cannot run content checks." >&2
+    exit 1
+fi
+
+# --- Secret scan: gitleaks on staged changes (fails closed) ---
+# Config: .gitleaks.toml. Install: https://github.com/gitleaks/gitleaks#installing
+if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "pre-commit: gitleaks not found; refusing to commit to a public repo" >&2
+    echo "without a secret scan. Install it (e.g. 'brew install gitleaks')." >&2
+    exit 1
+fi
+if ! gitleaks git --pre-commit --staged --redact --no-banner \
+        --config "$REPO_ROOT/.gitleaks.toml" .; then
+    echo >&2
+    echo "pre-commit: gitleaks found possible secrets in staged changes." >&2
+    echo "Remove them, or allowlist an obviously-fake value in .gitleaks.toml." >&2
     exit 1
 fi
 
