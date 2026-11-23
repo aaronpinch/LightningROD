@@ -1,0 +1,42 @@
+# gitleaks configuration. Used by .githooks/pre-commit and
+# .github/workflows/gitleaks.yml.
+#
+# Starts from gitleaks' built-in ruleset and adds project-specific rules.
+# Allowlist entries must be exact, obviously-fake values: never allowlist a
+# whole rule or a broad path to silence a real finding.
+
+title = "LightningROD gitleaks config"
+
+[extend]
+useDefault = true
+
+# North American VINs (WMI starts with 1-5 followed by a letter). Real VINs
+# identify a specific vehicle and its owner.
+[[rules]]
+id = "vehicle-vin"
+description = "Vehicle Identification Number"
+regex = '''\b[1-5][A-HJ-NPR-Z][A-HJ-NPR-Z0-9]{6}[0-9X][A-HJ-NPR-Z0-9]{8}\b'''
+keywords = ["1f", "2f", "3f", "4f", "5f", "1g", "2g", "3g", "1h", "2h", "5y", "1n", "5n", "1c", "2c", "3c", "1v", "3v", "5t", "4t", "2t", "4s", "5x", "5u", "7s"]
+  [[rules.allowlists]]
+  description = "Placeholder VINs (serial 00000)"
+  regexes = ['''[A-HJ-NPR-Z0-9]{12}00000''']
+
+# Remote-access URLs for a self-hosted Home Assistant instance.
+[[rules]]
+id = "ha-remote-url"
+description = "Home Assistant remote-access hostname"
+regex = '''(?i)\b[a-z0-9-]{6,}\.(?:ui\.nabu\.casa|duckdns\.org|ts\.net)\b'''
+keywords = ["nabu.casa", "duckdns", "ts.net"]
+
+[[allowlists]]
+description = "Known-fake test fixtures and vendored code"
+paths = [
+  '''^web/static/vendor/''',
+  '''^uv\.lock$''',
+  '''^package-lock\.json$''',
+]
+
+[[allowlists]]
+description = "Dummy Home Assistant token in data-sources tab test"
+regexTarget = "match"
+regexes = ['''abcdefgh12345678''']
